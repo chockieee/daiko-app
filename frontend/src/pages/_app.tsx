@@ -1,7 +1,7 @@
 import { AppBar } from "@/components/AppBar";
 import { AppDrawer, DrawerHeader } from "@/components/AppDrawer";
 import "@/styles/globals.css";
-import { CssBaseline } from "@mui/material";
+import { Box, CssBaseline } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import type { AppProps } from "next/app";
 import { useState } from "react";
@@ -41,11 +41,14 @@ export default function App({ Component, pageProps }: AppProps) {
     <>
       <CssBaseline />
       <AppBar open={open} handleDrawerOpen={handleOpen} />
-      <AppDrawer open={open} handleDrawerClose={handleClose} />
-      <Main open={open}>
-        <DrawerHeader />
-        <Component {...pageProps} />
-      </Main>
+      <Box display="flex">
+        <AppDrawer open={open} handleDrawerClose={handleClose} />
+
+        <Main open={open}>
+          <DrawerHeader />
+          <Component {...pageProps} />
+        </Main>
+      </Box>
     </>
   );
 }
