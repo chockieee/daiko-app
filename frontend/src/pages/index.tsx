@@ -8,22 +8,24 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import axios from "axios";
+import { GetServerSideProps } from "next";
 import Link from "next/link";
 
-function createData2(id: string, name: string, bookable: boolean) {
-  return { id, name, bookable };
-}
+type Shop = {
+  id: string;
+  name: string;
+  bookable: boolean;
+};
 
-const rows = [
-  createData2("1", "Buddy代行", false),
-  createData2("2", "テクノ代行　高松", true),
-  createData2("3", "２４代行運転（にーよん）", true),
-  createData2("4", "Bダッシュ代行", false),
-  createData2("5", "アスター代行", true),
-  createData2("6", "ハンドルサービス運転代行", true),
-];
+type Props = { result: Shop[] };
 
-export default function Home() {
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const res = await axios.get("http://localhost:8080/api/shops");
+  return { props: { result: res.data } };
+};
+
+export default function Home(props: Props) {
   return (
     <Container maxWidth="md">
       <TableContainer component={Paper}>
@@ -40,7 +42,7 @@ export default function Home() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
+            {props.result.map((row) => (
               <TableRow
                 hover
                 key={row.name}
@@ -61,7 +63,7 @@ export default function Home() {
                 <AppTableCell>
                   {row.bookable && (
                     <Link href={`/shops/${row.id}/request`} passHref>
-                      <Button variant="contained">依頼する</Button>
+                      <Button variant="contained"></Button>
                     </Link>
                   )}
                 </AppTableCell>

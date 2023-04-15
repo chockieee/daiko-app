@@ -7,16 +7,24 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import axios from "axios";
+import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 
-const data = {
-  id: "2",
-  name: "テクノ代行",
-  time: "１８時～４時　　　 (月は3時、日祝は2時)",
-  fee: `初乗り：１kmまで1400円　(会員料金)\n追　加：1kmごとに200円\nその他：※年会費無料　ご利用時にドライバーにお申し付け下さい。当日から会員料金でご利用になれます。`,
+type ShopDetail = {
+  id: string;
+  name: string;
+  time: string;
+  fee: string;
 };
 
-export default function ShopDetail() {
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const id = context.query;
+  const res = await axios.get(`http://localhost:8080/api/shops/${id}`);
+  return { props: res.data };
+};
+
+export default function ShopDetail(props: ShopDetail) {
   const router = useRouter();
   return (
     <>
@@ -27,7 +35,7 @@ export default function ShopDetail() {
               <TableRow>
                 <TableCell colSpan={2}>
                   <Typography variant="h6" component="p" color="white">
-                    {data.name}
+                    {props.name}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -38,7 +46,7 @@ export default function ShopDetail() {
                   <QueryBuilder />
                 </TableCell>
                 <TableCell>
-                  <Typography variant="body1">{data.time}</Typography>
+                  <Typography variant="body1">{props.time}</Typography>
                 </TableCell>
               </TableRow>
               <TableRow
@@ -52,7 +60,7 @@ export default function ShopDetail() {
                     variant="body1"
                     style={{ whiteSpace: "pre-line" }}
                   >
-                    {data.fee}
+                    {props.fee}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -62,7 +70,7 @@ export default function ShopDetail() {
         <Button
           variant="contained"
           onClick={() => {
-            router.push(`${data.id}/request`);
+            router.push(`${props.id}/request`);
           }}
         >
           依頼する
