@@ -1,9 +1,21 @@
 import { StatusChip } from "@/features/StatusChip";
 import FmdGoodIcon from "@mui/icons-material/FmdGood";
-import { Box, Container, Paper, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Paper,
+  Typography,
+} from "@mui/material";
 import axios from "axios";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
+import { useState } from "react";
 
 type Log = {
   id: string;
@@ -29,17 +41,29 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return { props: res.data };
 };
 
-const headers = ["", "配車依頼日時", "利用者", "出発地", "到着地", "料金"];
-
 export default function LogDetail(props: Log) {
   const router = useRouter();
   console.log(props);
+  const [open, setOpen] = useState(false);
+  const handleClose = () => setOpen(false);
+  const handleOpen = () => setOpen(true);
+
+  // キャンセルのイベント
+  const handleOk = () => {
+    axios
+      .put(`http://localhost:8080/api/requests/${props.id}/cancel`)
+      .then((response) => {
+        setOpen(false);
+      });
+  };
 
   return (
     <>
       <Container maxWidth="sm" sx={{ my: 5 }}>
         <Box sx={{ p: 2 }} component={Paper}>
-          <Box sx={{ px: 1, display: "flex", alignItems: "center", gap: 1 }}>
+          <Box
+            sx={{ px: 1, pt: 1, display: "flex", alignItems: "center", gap: 1 }}
+          >
             <Typography variant="body1">注文番号: {props.id}</Typography>
             <StatusChip
               variant="outlined"
@@ -159,7 +183,69 @@ export default function LogDetail(props: Log) {
               </Box>
             </Box>
           </Box>
+          {props.status === "active" && (
+            <Box sx={{ textAlign: "center", p: 1 }}>
+              <Button
+                variant="contained"
+                fullWidth
+                style={{ fontSize: "1.2rem" }}
+                onClick={handleOpen}
+              >
+                予約をキャンセルする
+              </Button>
+            </Box>
+          )}
         </Box>
+        <Dialog
+          onClose={handleClose}
+          open={open}
+          maxWidth="sm"
+          fullWidth
+          PaperProps={{
+            sx: {
+              left: "auto",
+              position: "fixed",
+              m: "0 0 0 240px",
+            },
+          }}
+        >
+          <DialogTitle
+            sx={{
+              backgroundColor: "primary.main",
+              color: "white",
+              mb: 3,
+            }}
+          >
+            確認
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText
+              sx={{
+                fontSize: "1.2rem",
+                wordWrap: "break-word",
+                whiteSpace: "pre-wrap",
+              }}
+            >
+              予約のキャンセルを実行しますか？
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions sx={{ pr: 3, pb: 3, gap: 1 }}>
+            <Button
+              variant="outlined"
+              onClick={handleClose}
+              sx={{ width: "110px" }}
+            >
+              キャンセル
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleOk}
+              sx={{ width: "110px" }}
+            >
+              OK
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Container>
     </>
   );
