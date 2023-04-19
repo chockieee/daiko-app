@@ -6,21 +6,20 @@ import { styled } from "@mui/material/styles";
 
 interface AppBarProps extends MuiAppBarProps {
   open: boolean;
+  width: number;
   handleDrawerOpen?: () => void;
 }
 
-const drawerWidth = 240;
-
 const TopBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
-})<AppBarProps>(({ theme, open }) => ({
+})<AppBarProps>(({ theme, open, width }) => ({
   transition: theme.transitions.create(["margin", "width"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
   ...(open && {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: `${drawerWidth}px`,
+    width: `calc(100% - ${width}px)`,
+    marginLeft: `${width}px`,
     transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
@@ -28,9 +27,13 @@ const TopBar = styled(MuiAppBar, {
   }),
 }));
 
-export const AppBar: React.FC<AppBarProps> = ({ open, handleDrawerOpen }) => {
+export const AppBar: React.FC<AppBarProps> = ({
+  open,
+  width,
+  handleDrawerOpen,
+}) => {
   return (
-    <TopBar position="fixed" open={open}>
+    <TopBar position="fixed" open={open} width={width}>
       <Toolbar>
         <IconButton
           color="inherit"

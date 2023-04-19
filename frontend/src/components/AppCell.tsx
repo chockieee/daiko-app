@@ -1,20 +1,29 @@
-import { TableCell } from "@mui/material";
+import {
+  styled,
+  TableCell as MuiTableCell,
+  TableCellProps,
+} from "@mui/material";
 import Link from "next/link";
 
-type Props = {
+interface Props extends TableCellProps {
   link?: string;
   children?: React.ReactNode;
-};
+}
 
-export const AppTableCell: React.FC<Props> = ({ link, children }) => {
+export const TableCell = styled(MuiTableCell)(({ theme, style }) => ({
+  ...style,
+  fontSize: "1rem",
+}));
+
+export const AppTableCell: React.FC<Props> = (props) => {
   return (
-    <TableCell>
-      {link ? (
-        <Link href={link} passHref>
-          {children}
+    <TableCell {...props}>
+      {props.link ? (
+        <Link href={props.link} passHref style={{ display: "block" }}>
+          {props.children}
         </Link>
       ) : (
-        children
+        props.children
       )}
     </TableCell>
   );

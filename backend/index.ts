@@ -3,6 +3,9 @@ import express from 'express';
 
 const app = express();
 const shopRoute = require("./routes/shops")
+const userRoute = require("./routes/users")
+const logRoute = require("./routes/logs")
+
 const PORT = 8080;
 
 
@@ -17,5 +20,7 @@ const options: cors.CorsOptions = {
 app.use(cors(options)); 
 app.use(express.json())
 app.use("/api/shops", shopRoute)
+app.use("/api/users", userRoute)
+app.use("/api/logs", logRoute)
 
 app.listen(PORT, ()=> console.log("サーバーが起動しました"))
