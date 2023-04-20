@@ -18,12 +18,12 @@ import { useRouter } from "next/router";
 
 type Log = {
   id: string;
-  company: string;
+  shopName: string;
   startTime: string;
-  name: string;
+  userName: string;
   from: string;
   to: string;
-  fare: number;
+  totalFare: number;
   status: string;
 };
 
@@ -46,11 +46,11 @@ const StatusChip: React.FC<{ status: string }> = ({ status }) => {
       return <></>;
   }
 };
-const format = "YYYY年MM月DD日";
+const format = "yyyy年MM月dd日";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const id = context.query;
-  const res = await axios.get(`http://localhost:8080/api/logs?id=1`);
+  const res = await axios.get(`http://localhost:8080/api/requests?id=1`);
   return { props: { logs: res.data } };
 };
 
@@ -87,11 +87,13 @@ export default function LogList(props: Props) {
                   <AppTableCell link={getUrl(log.id)}>
                     {dateFormat(log.startTime, format)}
                   </AppTableCell>
-                  <AppTableCell link={getUrl(log.id)}>{log.name}</AppTableCell>
+                  <AppTableCell link={getUrl(log.id)}>
+                    {log.userName}
+                  </AppTableCell>
                   <AppTableCell link={getUrl(log.id)}>{log.from}</AppTableCell>
                   <AppTableCell link={getUrl(log.id)}>{log.to}</AppTableCell>
                   <AppTableCell link={getUrl(log.id)}>
-                    {toCurrency(log.fare)}
+                    {toCurrency(log.totalFare)}
                   </AppTableCell>
                 </TableRow>
               ))}

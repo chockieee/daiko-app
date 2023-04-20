@@ -11,8 +11,8 @@ Leaflet.Icon.Default.imagePath =
 
 interface ShopDetail {
   id: number;
-  company: string;
-  adress: string;
+  name: string;
+  address: string;
   tel: string;
   isAvailable: true;
   position: Leaflet.LatLngExpression;
@@ -23,8 +23,7 @@ const commonStyle = { margin: "5px 0" };
 const Map = () => {
   const [shops, setShops] = useState<ShopDetail[]>([]);
   useEffect(() => {
-    axios.get(`http://localhost:8080/api/shops/map`).then((res) => {
-      console.log(res.data);
+    axios.get(`http://localhost:8080/api/shops`).then((res) => {
       setShops(res.data);
     });
   }, []);
@@ -34,7 +33,7 @@ const Map = () => {
       pathname: `/shops/${shop.id}/request`,
       query: {
         tab,
-        company: shop.company,
+        company: shop.name,
         isAvailable: shop.isAvailable,
       },
     };
@@ -60,10 +59,10 @@ const Map = () => {
                   variant="body1"
                   style={{ margin: 0, fontWeight: "bold" }}
                 >
-                  {shop.company}
+                  {shop.name}
                 </Typography>
                 <Typography variant="body2" style={commonStyle}>
-                  {shop.adress}
+                  {shop.address}
                 </Typography>
                 <Typography variant="body2" style={commonStyle}>
                   {shop.tel}

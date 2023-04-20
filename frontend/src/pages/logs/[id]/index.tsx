@@ -1,4 +1,6 @@
 import { StatusChip } from "@/features/StatusChip";
+import { dateFormat } from "@/utils/dateUtils";
+import { toCurrency } from "@/utils/numberUtils";
 import FmdGoodIcon from "@mui/icons-material/FmdGood";
 import {
   Box,
@@ -19,31 +21,35 @@ import { useState } from "react";
 
 type Log = {
   id: string;
-  status: string;
-  fare: {
-    total: number;
-    distance: number;
-    time: number;
-    pickup: number;
-    additional: number;
-  };
-  startTime: string;
-  payment: string;
-  from: { place: string; time: string };
-  to: { place: string; time: string };
+  shopName: string;
+  shopAddress: string;
+  shopTel: string;
+  userName: string;
+  from: string;
+  to: string;
   distance: number;
-  company: { name: string; address: string; tel: string };
+  startTime: Date;
+  endTime: Date;
+  totalFare: number;
+  distanceFare: number;
+  timeFare: number;
+  pickupFare: number;
+  additionalFare: number;
+  payment: string;
+  status: string;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const id = context.query;
-  const res = await axios.get(`http://localhost:8080/api/logs/${id}`);
+  const { id } = context.query;
+  const res = await axios.get(`http://localhost:8080/api/requests/${id}`);
   return { props: res.data };
 };
 
 export default function LogDetail(props: Log) {
   const router = useRouter();
   console.log(props);
+  const datetimeFormat = "yyyy/MM/dd(E) hh:mm";
+  const timeFormat = "HH:mm";
   const [open, setOpen] = useState(false);
   const handleClose = () => setOpen(false);
   const handleOpen = () => setOpen(true);
@@ -68,39 +74,39 @@ export default function LogDetail(props: Log) {
             <StatusChip
               variant="outlined"
               size="small"
-              sx={{ width: "70px" }}
+              sx={{ width: "90px" }}
               status={props.status}
             />
           </Box>
           <Box sx={{ py: 2, borderBottom: "1px solid rgba(224, 224, 224, 1)" }}>
             <Box sx={{ textAlign: "center", mb: 2 }}>
               <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-                ¥{props.fare.total}
+                {toCurrency(props.totalFare)}
               </Typography>
             </Box>
             <Box sx={{ px: 2 }}>
               <Box sx={{ display: "flex", mb: 0.5 }}>
                 <Typography sx={{ width: "20%" }}>距離料金</Typography>
                 <Typography sx={{ width: "80%", textAlign: "right" }}>
-                  ¥{props.fare.distance}
+                  {toCurrency(props.distanceFare)}
                 </Typography>
               </Box>
               <Box sx={{ display: "flex", mb: 0.5 }}>
                 <Typography sx={{ width: "20%" }}>時間料金</Typography>
                 <Typography sx={{ width: "80%", textAlign: "right" }}>
-                  ¥{props.fare.time}
+                  {toCurrency(props.timeFare)}
                 </Typography>
               </Box>
               <Box sx={{ display: "flex", mb: 0.5 }}>
                 <Typography sx={{ width: "20%" }}>回送料金</Typography>
                 <Typography sx={{ width: "80%", textAlign: "right" }}>
-                  ¥{props.fare.pickup}
+                  {toCurrency(props.pickupFare)}
                 </Typography>
               </Box>
               <Box sx={{ display: "flex" }}>
                 <Typography sx={{ width: "20%" }}>追加料金</Typography>
                 <Typography sx={{ width: "80%", textAlign: "right" }}>
-                  ¥{props.fare.additional}
+                  {toCurrency(props.additionalFare)}
                 </Typography>
               </Box>
             </Box>
@@ -115,7 +121,9 @@ export default function LogDetail(props: Log) {
             <Box sx={{ px: 1 }}>
               <Box sx={{ display: "flex", mb: 0.5 }}>
                 <Typography sx={{ width: "20%" }}>利用日時</Typography>
-                <Typography>{props.startTime}</Typography>
+                <Typography>
+                  {dateFormat(props.startTime, datetimeFormat)}
+                </Typography>
               </Box>
               <Box sx={{ display: "flex", mb: 0.5 }}>
                 <Typography sx={{ width: "20%" }}>決済方法</Typography>
@@ -137,8 +145,10 @@ export default function LogDetail(props: Log) {
               <Box display="flex" alignItems="center" gap={1}>
                 <FmdGoodIcon fontSize="large" />
                 <Box>
-                  <Typography>{props.from.time}</Typography>
-                  <Typography>{props.from.place}</Typography>
+                  <Typography>
+                    {dateFormat(props.startTime, timeFormat)}
+                  </Typography>
+                  <Typography>{props.from}</Typography>
                 </Box>
               </Box>
               <Box
@@ -158,8 +168,10 @@ export default function LogDetail(props: Log) {
               <Box display="flex" alignItems="center" gap={1}>
                 <FmdGoodIcon fontSize="large" />
                 <Box>
-                  <Typography>{props.to.time}</Typography>
-                  <Typography>{props.to.place}</Typography>
+                  <Typography>
+                    {dateFormat(props.endTime, timeFormat)}
+                  </Typography>
+                  <Typography>{props.to}</Typography>
                 </Box>
               </Box>
             </Box>
@@ -171,15 +183,15 @@ export default function LogDetail(props: Log) {
             <Box sx={{ px: 1 }}>
               <Box sx={{ display: "flex", mb: 0.5 }}>
                 <Typography sx={{ width: "20%" }}>会社名</Typography>
-                <Typography>{props.company.name}</Typography>
+                <Typography>{props.shopName}</Typography>
               </Box>
               <Box sx={{ display: "flex", mb: 0.5 }}>
                 <Typography sx={{ width: "20%" }}>住所</Typography>
-                <Typography>{props.company.address}</Typography>
+                <Typography>{props.shopAddress}</Typography>
               </Box>
               <Box sx={{ display: "flex" }}>
                 <Typography sx={{ width: "20%" }}>電話番号</Typography>
-                <Typography>{props.company.tel}</Typography>
+                <Typography>{props.shopTel}</Typography>
               </Box>
             </Box>
           </Box>

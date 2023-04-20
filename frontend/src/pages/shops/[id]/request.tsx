@@ -72,8 +72,9 @@ export default function Request() {
   ];
 
   const onSubmit: SubmitHandler<IFormInputs> = (data) => {
+    const body = { ...data, shopId: id };
     axios
-      .post(`http://localhost:8080/api/shops/${id}/request`, data)
+      .post(`http://localhost:8080/api/requests/`, body)
       .then((response) => {
         setOpen(true);
       })

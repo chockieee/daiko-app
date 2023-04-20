@@ -1,7 +1,9 @@
-import { formatToTimeZone } from "date-fns-timezone";
+import { format } from "date-fns";
+import { ja } from "date-fns/locale";
 
-// 日本のタイムゾーンで変換する
-export const dateFormat = (date: string, format: string): string => {
-  const timeZone = "Asia/Tokyo";
-  return formatToTimeZone(date, format, { timeZone });
+export const dateFormat = (
+  date: string | number | Date,
+  format2: string
+): string => {
+  return format(new Date(date), format2, { locale: ja });
 };
