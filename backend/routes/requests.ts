@@ -21,7 +21,7 @@ router.get("/", (req, res) => {
  * 予約の登録
  */
 router.post("/", (req, res) => {
-  res.send("予約を完了しました");
+  res.send(requests[0].id);
 });
 
 /**

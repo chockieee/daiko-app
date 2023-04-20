@@ -1,4 +1,3 @@
-import { AppButton } from "@/components/AppButton";
 import { AppTextField } from "@/components/AppTextField";
 import { toBoolean } from "@/utils/booleanUtils";
 import {
@@ -30,17 +29,17 @@ interface IFormInputs {
   name: string;
   tel: string;
   mail: string;
+  carNo: string;
+  carModel: string;
 }
 
 export default function Request() {
   const router = useRouter();
-  console.log(router.query);
   const { id, company } = router.query;
   const isAvailable =
     typeof router.query.isAvailable === "string"
       ? toBoolean(router.query.isAvailable)
       : false;
-  console.log(`isAvailable: ${isAvailable}`);
   const [tab, setTab] = useState(router.query.tab || "now");
   const [open, setOpen] = useState(false);
   const label = tab === "now" ? "配車" : "予約";
@@ -57,6 +56,8 @@ export default function Request() {
       name: "",
       tel: "",
       mail: "",
+      carNo: "",
+      carModel: "",
       date: null,
     },
   });
@@ -67,16 +68,18 @@ export default function Request() {
     { name: "mail", label: "メールアドレス", rules: { required: true } },
     { name: "from", label: "出発地", rules: { required: true } },
     { name: "to", label: "到着地", rules: { required: true } },
-    { name: "num", label: "車のナンバー" },
-    { name: "model", label: "車種" },
+    { name: "carNo", label: "車のナンバー" },
+    { name: "carModel", label: "車種" },
   ];
 
   const onSubmit: SubmitHandler<IFormInputs> = (data) => {
     const body = { ...data, shopId: id };
     axios
       .post(`http://localhost:8080/api/requests/`, body)
-      .then((response) => {
-        setOpen(true);
+      .then((res) => {
+        setOpen(false);
+        //　予約履歴詳細ページへ遷移
+        router.push(`/logs/${res.data}`);
       })
       .catch((error) => {
         console.log(error.data);
@@ -143,17 +146,11 @@ export default function Request() {
               <Button
                 variant="contained"
                 fullWidth
-                style={{
-                  borderRadius: "25px",
-                  width: "80%",
-                  height: "50px",
-                  fontWeight: "bold",
-                  fontSize: "1.3rem",
-                }}
+                style={{ fontSize: "1.2rem" }}
                 onClick={handleOpen}
                 disabled={!isDirty}
               >
-                {label + "注文"}
+                {label + "を注文する"}
               </Button>
             </Box>
           </Box>
@@ -176,31 +173,37 @@ export default function Request() {
           sx={{
             backgroundColor: "primary.main",
             color: "white",
-            fontWeight: "bold",
-            textAlign: "center",
             mb: 3,
           }}
         >
           {label + "注文確認"}
         </DialogTitle>
-        <DialogContent sx={{ pt: 10, height: "20vh" }}>
+        <DialogContent>
           <DialogContentText
             sx={{
               fontSize: "1.2rem",
               wordWrap: "break-word",
               whiteSpace: "pre-wrap",
-              mx: 10,
-              my: 5,
             }}
           >
-            {`${name}さんの\n\r配車を注文します。`}
+            入力した内容で配車を注文しますか？
           </DialogContentText>
         </DialogContent>
-        <DialogActions style={{ textAlign: "center", display: "block" }}>
-          <AppButton onClick={handleClose}>閉じる</AppButton>
-          <AppButton onClick={handleSubmit(onSubmit)}>
-            {label + "注文"}
-          </AppButton>
+        <DialogActions sx={{ pr: 3, pb: 3, gap: 1 }}>
+          <Button
+            variant="outlined"
+            onClick={handleClose}
+            sx={{ width: "110px" }}
+          >
+            キャンセル
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSubmit(onSubmit)}
+            sx={{ width: "110px" }}
+          >
+            OK
+          </Button>
         </DialogActions>
       </Dialog>
     </Container>

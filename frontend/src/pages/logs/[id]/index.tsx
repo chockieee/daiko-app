@@ -228,7 +228,7 @@ export default function LogDetail(props: Log) {
               mb: 3,
             }}
           >
-            確認
+            予約キャンセル確認
           </DialogTitle>
           <DialogContent>
             <DialogContentText
