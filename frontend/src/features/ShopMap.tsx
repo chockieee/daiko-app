@@ -9,7 +9,7 @@ import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 Leaflet.Icon.Default.imagePath =
   "//cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/";
 
-interface ShopDetail {
+export interface IShop {
   id: number;
   name: string;
   address: string;
@@ -21,21 +21,17 @@ interface ShopDetail {
 const commonStyle = { margin: "5px 0" };
 
 const Map = () => {
-  const [shops, setShops] = useState<ShopDetail[]>([]);
+  const [shops, setShops] = useState<IShop[]>([]);
   useEffect(() => {
     axios.get(`http://localhost:8080/api/shops`).then((res) => {
       setShops(res.data);
     });
   }, []);
 
-  const getHref = (shop: ShopDetail, tab: "now" | "book") => {
+  const getHref = (shop: IShop, tab: "now" | "book") => {
     return {
-      pathname: `/shops/${shop.id}/request`,
-      query: {
-        tab,
-        company: shop.name,
-        isAvailable: shop.isAvailable,
-      },
+      pathname: `/request`,
+      query: { shop: shop.id, tab },
     };
   };
 
@@ -92,7 +88,7 @@ const Map = () => {
                 >
                   <Link
                     href={getHref(shop, "now")}
-                    as={`/shops/${shop.id}/request`}
+                    as={`/request?shop=${shop.id}`}
                     passHref
                   >
                     <Button variant="contained" disabled={!shop.isAvailable}>
@@ -101,7 +97,7 @@ const Map = () => {
                   </Link>
                   <Link
                     href={getHref(shop, "book")}
-                    as={`/shops/${shop.id}/request`}
+                    as={`/request?shop=${shop.id}`}
                     passHref
                   >
                     <Button variant="contained">予約手配</Button>

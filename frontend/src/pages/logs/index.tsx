@@ -1,10 +1,9 @@
-import { AppTableCell } from "@/components/AppCell";
+import { AppTableCell } from "@/components/AppTableCell";
+import { StatusChip } from "@/features/StatusChip";
 import { dateFormat } from "@/utils/dateUtils";
 import { toCurrency } from "@/utils/numberUtils";
 import {
-  Chip,
   Container,
-  styled,
   Table,
   TableBody,
   TableHead,
@@ -14,7 +13,6 @@ import Paper from "@mui/material/Paper";
 import TableContainer from "@mui/material/TableContainer";
 import axios from "axios";
 import { GetServerSideProps } from "next";
-import { useRouter } from "next/router";
 
 type Log = {
   id: string;
@@ -29,35 +27,14 @@ type Log = {
 
 type Props = { logs: Log[] };
 
-export const AppChip = styled(Chip)(({ theme }) => ({
-  width: "80%",
-  textAlignLast: "justify",
-}));
-
-const StatusChip: React.FC<{ status: string }> = ({ status }) => {
-  switch (status) {
-    case "cancel":
-      return <AppChip label="キャンセル" variant="outlined" color="error" />;
-    case "past":
-      return <AppChip label="完了" variant="outlined" color="success" />;
-    case "active":
-      return <AppChip label="予約" variant="outlined" color="primary" />;
-    default:
-      return <></>;
-  }
-};
-const format = "yyyy年MM月dd日";
-
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const id = context.query;
   const res = await axios.get(`http://localhost:8080/api/requests?id=1`);
   return { props: { logs: res.data } };
 };
 
-const headers = ["", "配車依頼日時", "利用者", "出発地", "到着地", "料金"];
-
 export default function LogList(props: Props) {
-  const router = useRouter();
+  const format = "yyyy年MM月dd日";
+  const headers = ["", "配車依頼日時", "利用者", "出発地", "到着地", "料金"];
   const getUrl = (logId: string) => {
     return `/logs/${logId}`;
   };
@@ -82,7 +59,11 @@ export default function LogList(props: Props) {
                     link={getUrl(log.id)}
                     style={{ textAlign: "center", width: "13%" }}
                   >
-                    <StatusChip status={log.status} />
+                    <StatusChip
+                      variant="outlined"
+                      sx={{ width: "80%", textAlignLast: "justify" }}
+                      status={log.status}
+                    />
                   </AppTableCell>
                   <AppTableCell link={getUrl(log.id)}>
                     {dateFormat(log.startTime, format)}

@@ -47,7 +47,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 export default function LogDetail(props: Log) {
   const router = useRouter();
-  console.log(props);
   const datetimeFormat = "yyyy/MM/dd(E) hh:mm";
   const timeFormat = "HH:mm";
   const [open, setOpen] = useState(false);

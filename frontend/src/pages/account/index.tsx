@@ -28,7 +28,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 export default function MyAccount(props: UserInfo) {
   const router = useRouter();
-  console.log(props);
   return (
     <>
       <Container maxWidth="sm" sx={{ my: 5 }}>

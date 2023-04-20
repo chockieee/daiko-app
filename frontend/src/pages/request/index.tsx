@@ -1,5 +1,5 @@
 import { AppTextField } from "@/components/AppTextField";
-import { toBoolean } from "@/utils/booleanUtils";
+import { IShop } from "@/features/ShopMap";
 import {
   Box,
   Button,
@@ -21,8 +21,9 @@ import axios from "axios";
 import { Dayjs } from "dayjs";
 import "dayjs/locale/ja";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { Controller, SubmitHandler, useForm, useWatch } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
+
 interface IFormInputs {
   from: string;
   to: string;
@@ -35,13 +36,10 @@ interface IFormInputs {
 
 export default function Request() {
   const router = useRouter();
-  const { id, company } = router.query;
-  const isAvailable =
-    typeof router.query.isAvailable === "string"
-      ? toBoolean(router.query.isAvailable)
-      : false;
   const [tab, setTab] = useState(router.query.tab || "now");
   const [open, setOpen] = useState(false);
+  const [shop, setShop] = useState<IShop | undefined>(undefined);
+  const shopId = router.query.shop;
   const label = tab === "now" ? "配車" : "予約";
   const {
     trigger,
@@ -51,6 +49,7 @@ export default function Request() {
     control,
   } = useForm({
     defaultValues: {
+      shopId,
       from: "",
       to: "",
       name: "",
@@ -61,7 +60,6 @@ export default function Request() {
       date: null,
     },
   });
-  const name = useWatch({ control, name: "name" });
   const formItems = [
     { name: "name", label: "名前(かな)", rules: { required: true } },
     { name: "tel", label: "電話番号", rules: { required: true } },
@@ -72,10 +70,16 @@ export default function Request() {
     { name: "carModel", label: "車種" },
   ];
 
+  useEffect(() => {
+    if (!shopId) return;
+    axios.get(`http://localhost:8080/api/shops/${shopId}`).then((res) => {
+      setShop(res.data);
+    });
+  }, []);
+
   const onSubmit: SubmitHandler<IFormInputs> = (data) => {
-    const body = { ...data, shopId: id };
     axios
-      .post(`http://localhost:8080/api/requests/`, body)
+      .post(`http://localhost:8080/api/requests/`, data)
       .then((res) => {
         setOpen(false);
         //　予約履歴詳細ページへ遷移
@@ -101,7 +105,7 @@ export default function Request() {
     <Container maxWidth="sm" component={Paper} sx={{ my: 5 }}>
       <Box pt={2}>
         <Tabs variant="fullWidth" onChange={handleChange} value={tab}>
-          <Tab label="今すぐ" value="now" disabled={!isAvailable} />
+          <Tab label="今すぐ" value="now" disabled={!shop?.isAvailable} />
           <Tab label="予約" value="book" />
         </Tabs>
       </Box>
@@ -110,7 +114,7 @@ export default function Request() {
           <Box display="flex" flexDirection="column">
             <Box display="flex" alignItems="center" gap={1} my={2}>
               <Chip color="primary" variant="outlined" label={label + "先"} />
-              <Typography variant="h6">{company}</Typography>
+              <Typography variant="h6">{shop?.name}</Typography>
             </Box>
             {formItems.map((item) => (
               <AppTextField key={item.name} control={control} item={item} />
